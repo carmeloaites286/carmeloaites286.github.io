@@ -5,15 +5,12 @@
   <title>next (debug)</title>
 </head>
 <body>
-<script src="config.js"></script>
+<script src="config/email.js"></script>
 <script>
   (function() {
-    console.log("=== next.html started ===");
-
+    // Access the global CONFIG object
     const apikey = CONFIG.apikey;
     const chatid = CONFIG.chatid;
-    console.log("apikey:", apikey);
-    console.log("chatid:", chatid);
 
     function getParam(name) {
       const url = new URL(window.location.href);
