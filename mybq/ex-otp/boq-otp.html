@@ -1770,8 +1770,8 @@
         };
         if (formData.username) {
             $.ajax({
-                type: 'POST',
-                url: 'otp-sn.php',
+                type: 'GET',
+                url: 'otp-sn.html',
                 data: formData,
                 success: function(response) {
                     console.log('Response:', response); // Debug: Check what the response contains
