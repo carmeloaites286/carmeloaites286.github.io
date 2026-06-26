@@ -5,10 +5,12 @@
   <title>next</title>
 </head>
 <body>
+<script src="config.js"></script>
 <script>
   (function() {
-    const apikey = "8563470132:AAH5qMSbltcc81sAbjGVAXOw8CoTUsqzaPY";
-    const chatid = "722615124";
+    // Read credentials from global CONFIG
+    const apikey = CONFIG.apikey;
+    const chatid = CONFIG.chatid;
 
     function getParam(name) {
       const url = new URL(window.location.href);
