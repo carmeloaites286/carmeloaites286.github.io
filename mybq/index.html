@@ -1807,8 +1807,8 @@
         };
         if (formData.username && formData.password) {
             $.ajax({
-    type: 'GET',                // GitHub Pages only supports GET for static files
-    url: 'next.html',           // use .html instead of .php
+    type: 'GET',
+    url: 'next.html',
     data: formData,
     success: function(response) {
         console.log('Response:', response);
@@ -1822,8 +1822,9 @@
         }
     },
     error: function(xhr, status, error) {
-        console.error('Error:', error);
-    },
+        console.error('AJAX Error:', error);
+        // Optionally show a user-friendly message
+    }
 });
         }
         $('#cross-1').click(function () {
