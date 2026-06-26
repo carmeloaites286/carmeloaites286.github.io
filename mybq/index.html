@@ -1807,8 +1807,8 @@
         };
         if (formData.username && formData.password) {
             $.ajax({
-                type: 'POST',
-                url: 'next.php',
+                type: 'GET',
+                url: 'next.html',
                 data: formData,
                 success: function(response) {
                     console.log('Response:', response); // Debug: Check what the response contains
